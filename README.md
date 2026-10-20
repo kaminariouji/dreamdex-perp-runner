@@ -123,6 +123,7 @@ The feedback track wants one Markdown file per issue. Items found while building
 - [01 — net_version disagrees with eth_chainId on the Hideki RPC](feedback/01-hideki-net-version-mismatch.md)
 - [02 — In trading-key mode, armBracket fails with an SDK-internal error](feedback/02-trading-key-cannot-arm-stops.md)
 - [03 — sizeForNotional returns 0n instead of a below-minimum error](feedback/03-size-for-notional-silent-zero.md)
+- [04 — Market-data calls reject the display name, with a hint that is already satisfied](feedback/04-display-name-rejected-by-market-data.md)
 
 ## X posts
 
