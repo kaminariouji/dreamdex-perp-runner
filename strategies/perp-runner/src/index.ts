@@ -199,6 +199,18 @@ async function main(): Promise<void> {
       }
     }
 
+    // A cycle that runs out of time must not leave the position behind: the next
+    // cycle would only adopt it, and the run summary would describe a position
+    // the bot never opened. Flatten on timeout and record it.
+    if (outcome === "timeout") {
+      const stale = await requireMarket(ctx.exchange, market.symbol, { reload: true });
+      const stillOpen = await positionIn(ctx.exchange, stale);
+      if (stillOpen) {
+        await closePosition(ctx, stale, me, { label: "timeout" });
+        record({ event: "close", cycle, reason: "timeout", upnl: lastPnl });
+      }
+    }
+
     summary.cycles++;
     if (outcome === "take-profit") summary.takeProfit++;
     else if (outcome === "stop-loss") summary.stopLoss++;
