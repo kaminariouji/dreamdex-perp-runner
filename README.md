@@ -77,15 +77,18 @@ be separated after the fact.
 
 ### What the numbers say
 
-36 cycles ran across four runs. The timeout path does flatten instead of adopting a position into
-the next cycle. Two things the log does **not** support, stated plainly:
+36 cycles ran across four runs. The timeout path attempts to flatten rather than adopt a position
+into the next cycle, but 5 of the 22 timeouts ended with no close event at all, so the log cannot
+prove those positions were flat when the next cycle started. Two things the log does **not**
+support, stated plainly:
 
 - **10 of 36 cycles have no "close" event.** 5 ended with the position already gone when the bot
   looked (outcome `closed`), and 5 reached the wait limit only to find nothing left to flatten.
   "Every position closed" is a claim about what the bot attempts, not something this log proves.
 - **The first two runs share one log file.** Two runners wrote to the same
   runs/<SYMBOL>-<date>.jsonl on 2026-10-20, so their cycles interleave and some of them closed
-  each other's positions. Since this audit each run writes to ...-<pid>.jsonl instead.
+  each other's positions. Since this audit each run writes to ...-<pid>.jsonl instead, and the
+  runner re-checks for an open position before it exits instead of only printing a warning.
 
 Of the 36 cycles, **22** ran to the wait limit, **9** ended on take-profit, and **5** ended with
 the position gone before a level was reached — an earlier summary counted those 5 as timeouts.

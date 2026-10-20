@@ -157,14 +157,20 @@ async function main(): Promise<void> {
   } else {
     const link = await tradingKeyCheck(ctx, market);
     if (link.message) console.log(link.message);
-    if (!link.ok && !DRY_RUN) process.exit(1);
+    if (!link.ok && !DRY_RUN) {
+      await emergencyExit?.();
+      process.exit(1);
+    }
 
     const check = await preflight(ctx.exchange, market, me, {
       requiredUsdso: NOTIONAL / Math.max(1, LEVERAGE),
       linkedAccount: Boolean(ctx.config.owner),
     });
     console.log(check.message);
-    if (!check.ok) process.exit(1);
+    if (!check.ok) {
+      await emergencyExit?.();
+      process.exit(1);
+    }
 
     const lev = await ensureLeverage(ctx, market, me, LEVERAGE);
     if (!lev.dryRun) {
@@ -361,9 +367,13 @@ async function main(): Promise<void> {
 
   console.log(
     "summary: " + summary.cycles + " cycle(s) | take-profit " + summary.takeProfit + " | stop-loss " + summary.stopLoss +
-      " | timeout " + summary.timeouts + " | net uPnL " + summary.netPnl.toFixed(4) + " USDso",
+      " | timeout " + summary.timeouts + " | closed " + summary.closed + " | net uPnL " + summary.netPnl.toFixed(4) + " USDso",
   );
   record({ event: "summary", ...summary, evidence: EVIDENCE });
+  // The timeout flatten above only warns when its close does not go through, and a
+  // run that ends on that cycle would exit with the position still open. Check once
+  // more before leaving: this process is the only thing watching the mark.
+  await emergencyExit?.();
   await shutdown(ctx);
 }
 

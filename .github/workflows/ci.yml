@@ -75,8 +75,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      # Twelve test files across backtest, ec-core and perp-core. Until this step
-      # existed none of them ran on a pull request.
+      # Ten test files across backtest, ec-core and perp-core. Until this step
+      # existed none of them ran on a pull request. Two more test files live in
+      # examples/ and tools/ and are not wired into this script.
       - name: Test
         run: npm test
 
