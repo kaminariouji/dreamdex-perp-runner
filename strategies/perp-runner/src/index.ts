@@ -25,6 +25,7 @@ import {
   createExchange,
   ensureLeverage,
   envNum,
+  liveFunding,
   liveMark,
   loadEnv,
   markOf,
@@ -55,6 +56,10 @@ const TICK_MS = envNum("PERP_TICK_MS", 10000);
 const MAX_CYCLES = envNum("PERP_MAX_CYCLES", 3);
 const COOLDOWN_MS = envNum("PERP_COOLDOWN_MS", 15000);
 const MAX_WAIT_MS = envNum("PERP_MAX_WAIT_PER_CYCLE_MS", 900000);
+// 0 disables the gate. Above 0, a cycle only opens when the venue pays OUR side at
+// least this APR: a bracket on a coin nobody is paying to hold is a coin flip, and
+// the funding is the only part of the trade the venue states in advance.
+const MIN_FUNDING_APR = envNum("PERP_MIN_FUNDING_APR", 0);
 const DRY_RUN = process.env.DRY_RUN !== "false";
 
 const RUN_DIR = process.cwd() + "/runs";
@@ -119,6 +124,22 @@ async function main(): Promise<void> {
     // Reuse a position that is already open instead of stacking a second one.
     const existing = me ? await positionIn(ctx.exchange, market) : undefined;
     if (!existing) {
+      const funding = await liveFunding(ctx.exchange, market);
+      if (MIN_FUNDING_APR > 0) {
+        const paysUs = funding.known && funding.paidSide === SIDE;
+        const apr = Math.abs(funding.apr ?? 0);
+        if (!paysUs || apr * 100 < MIN_FUNDING_APR) {
+          const why = !funding.known
+            ? "funding cannot be read"
+            : "funding pays " + funding.paidSide + " at " + (apr * 100).toFixed(2) + "% APR";
+          console.log("standing down: " + why + ", below the " + MIN_FUNDING_APR + "% gate for a " + SIDE);
+          record({ event: "skip", cycle, reason: "funding", apr: funding.apr, paid: funding.paidSide });
+          if (cycle < MAX_CYCLES && !stopped()) await sleep(COOLDOWN_MS, stopped);
+          continue;
+        }
+        console.log("funding pays " + SIDE + " at " + (apr * 100).toFixed(2) + "% APR, above the " + MIN_FUNDING_APR + "% gate");
+        record({ event: "funding", cycle, apr: funding.apr, paid: funding.paidSide });
+      }
       const book = await ctx.exchange.fetchOrderBook(market.symbol, 1);
       const touch = SIDE === "long" ? book.asks[0]?.[0] : book.bids[0]?.[0];
       if (touch === undefined) {
@@ -174,6 +195,7 @@ async function main(): Promise<void> {
     console.log("watching take-profit " + px(takeProfit) + " and stop-loss " + px(stopLoss));
 
     let waited = 0;
+    let ticks = 0;
     let outcome = "timeout";
     let lastPnl = 0;
 
@@ -199,6 +221,19 @@ async function main(): Promise<void> {
         position.side + " " + position.contracts + " " + fresh.info.baseSymbol + " | uPnL " +
           (position.unrealizedPnl?.toFixed(4) ?? "?") + " | mark " + live.toFixed(2),
       );
+      // A carry position is judged over hours, so the log needs a time series:
+      // the mark, the unrealised PnL and what the venue is paying while we hold.
+      if (++ticks % 10 === 0) {
+        const f = await liveFunding(ctx.exchange, fresh);
+        record({
+          event: "hold",
+          cycle,
+          mark: live.toFixed(2),
+          upnl: lastPnl,
+          fundingApr: f.known ? f.apr : null,
+          paid: f.paidSide ?? null,
+        });
+      }
 
       if (hitTakeProfit || hitStopLoss) {
         const reason = hitTakeProfit ? "take-profit" : "stop-loss";

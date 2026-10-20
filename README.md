@@ -80,6 +80,33 @@ these settings — a 0.12% take-profit is inside two minutes of noise on ETH-PER
 cycles ended on the timeout rather than on a level. That is a parameter finding, not a code
 finding: widening the target or trailing the mark is the next experiment.
 
+## Why this side: funding
+
+A bracket on a coin nobody is paying you to hold is a coin flip with a fee attached. The venue
+states one thing in advance — the funding rate — so the runner reads it before it opens anything
+(`PERP_MIN_FUNDING_APR`, 0 disables the gate). Measured on 2026-10-20 over the last 48 settled
+intervals per market (`fundingWindowSec` 28800, `fundingIntervalSec` 3600):
+
+| Market | Min APR | Median APR | Max APR | Intervals paying shorts |
+| --- | --- | --- | --- | --- |
+| BTC-PERP | 93.18% | 170.76% | 305.80% | 48 / 48 |
+| ETH-PERP | 10.95% | 10.95% | 10.95% | 48 / 48 |
+| LIT-PERP | −52.21% | −29.88% | 10.95% | 1 / 48 (pays longs) |
+
+Funding is not a signal about price. It is a payment for holding a side, and it is the only part of
+the trade that is known before the entry. The gate turns it into a filter: with
+`PERP_MIN_FUNDING_APR=50`, a short on BTC-PERP opens and a long stands down —
+
+```
+funding pays short at 155.64% APR, above the 50% gate
+standing down: funding pays short at 155.64% APR, below the 50% gate for a long
+```
+
+Scale, stated plainly: 170% APR is 0.019% per hour. On a $300 short that is about six cents an
+hour, so a 90-minute run measures the mechanism, not the yield — over a day the price moves more
+than the funding pays. The carry only becomes the dominant term when the position is held for
+days, or when it is hedged, and this market has no spot leg to hedge with yet.
+
 ## Feedback items
 
 The feedback track wants one Markdown file per issue. Items found while building this bot live in
