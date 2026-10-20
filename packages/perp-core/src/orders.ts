@@ -134,6 +134,8 @@ export interface PlaceArgs {
 export interface PlaceResult {
   sent: boolean;
   orderId?: bigint;
+  /** Hash of the transaction that carried the order, when the write returned one. */
+  txHash?: `0x${string}`;
   filled: bigint;
   /** True when an IOC found nothing to cross. Not an error: the book moved. */
   noFill?: boolean;
@@ -196,7 +198,7 @@ export async function placePerp(args: PlaceArgs): Promise<PlaceResult> {
   assertTxOk(res as { hash?: string; receipt?: { status?: string } }, what);
   const filled = (res.fills ?? []).reduce((sum, f) => sum + f.quantityFilled, 0n);
   console.log(`placed ${what} | filled ${Number(filled) / 10 ** market.info.baseDecimals} | order ${res.orderId ?? "-"}`);
-  return { sent: true, orderId: res.orderId, filled };
+  return { sent: true, orderId: res.orderId, filled, txHash: (res as { hash?: `0x${string}` }).hash };
 }
 
 /** Cancel one resting order, tolerating the race where it already went away. */

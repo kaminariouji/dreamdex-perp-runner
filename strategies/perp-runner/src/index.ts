@@ -147,6 +147,7 @@ async function main(): Promise<void> {
         sent: opened.sent,
         filled: String(opened.filled ?? BigInt(0)),
         orderId: opened.orderId ? String(opened.orderId) : null,
+        txHash: opened.txHash ?? null,
       });
       if (opened.sent && opened.filled === BigInt(0)) {
         console.log("nothing crossed, the price moved. Exiting rather than resting an unintended maker order.");
@@ -209,6 +210,7 @@ async function main(): Promise<void> {
           mark: live.toFixed(2),
           upnl: lastPnl,
           orderId: closed?.orderId ? String(closed.orderId) : null,
+          txHash: closed?.txHash ?? null,
         });
         outcome = reason;
         break;
@@ -229,6 +231,7 @@ async function main(): Promise<void> {
           reason: "timeout",
           upnl: lastPnl,
           orderId: closed?.orderId ? String(closed.orderId) : null,
+          txHash: closed?.txHash ?? null,
         });
       }
     }
