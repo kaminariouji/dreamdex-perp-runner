@@ -59,7 +59,7 @@ and keep "call loadMarkets() first" for when `markets` is actually empty.
 
 ## Where it comes from
 
-`dist/unified/symbols.js:161-169`, `resolve()`: a non-chain ref goes straight to
+`dist/unified/symbols.js:161-169` (0.30.0; `:219` in 0.31.0), `resolve()`: a non-chain ref goes straight to
 `this.bySymbol.get(marketSymbol)`, and `bySymbol` is keyed only by the synthesized
 symbol built in `build()`. `byRef` already holds the market id, the pool address and
 (binary) the market address — the display name is the one handle that is never
@@ -70,10 +70,17 @@ fixes the lookup; the message fix alone is three lines and removes the wrong lea
 
 ## Evidence
 
-Live Hideki testnet, 2026-10-20 15:5x UTC, `@somnia-chain/markets-sdk 0.31.0`,
-`@dreamdex-bot-kit/perp-core 0.1.0`. Output above is verbatim; the successful call
-returned `[1792494000000,81628.3,82490,81538.2,81572.6,7.7571]`, so the data path is
-fine.
+Live Hideki testnet, 2026-10-20 15:33 UTC. Reproduced on `@somnia-chain/markets-sdk
+0.30.0` (the version installed in the working copy) with `@dreamdex-bot-kit/perp-core
+0.1.0`, Node v24.21.0; raw run in [04.log](04.log). Output above is verbatim, and the
+successful call returned `[1792494000000,81628.3,82490,81538.2,81572.6,7.7571]`, so the
+data path is fine.
+
+The published `0.31.0` tarball — the range `packages/perp-core/package.json` declares —
+carries the same path: `resolve()` still goes from `splitSymbol()` straight to
+`this.bySymbol.get()` and still throws `unknown symbol ${ref} — call loadMarkets()
+first` (`dist/unified/symbols.js:219`). No display-name handling was added, so this is
+not fixed in the newer release.
 
 The docs make the miss more likely rather than less: the only candle example in
 `docs/backtesting.md` is `--symbol WETH:USDso`, a spot pair, so `BTC:USDso` is the
