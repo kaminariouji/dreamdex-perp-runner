@@ -67,6 +67,8 @@ The feedback track wants one Markdown file per issue. Items found while building
 this bot live in [feedback/](feedback/):
 
 - [01 — net_version disagrees with eth_chainId on the Hideki RPC](feedback/01-hideki-net-version-mismatch.md)
+- [02 — Trading-key mode cannot reach the stop-order helpers](feedback/02-trading-key-cannot-arm-stops.md)
+- [03 — sizeForNotional returns 0n instead of a below-minimum error](feedback/03-size-for-notional-silent-zero.md)
 
 ## X posts
 
