@@ -74,6 +74,7 @@ Posts about this MVP, tagging [@DreamDEXSomnia](https://x.com/DreamDEXSomnia):
 
 - [Announcing the bot](https://x.com/kaminariouji/status/2112506360290300099)
 - [The trading-key edge: exits must be watched, not armed](https://x.com/kaminariouji/status/2112506535456960976)
+- [Run evidence: live order ids and the run log](https://x.com/kaminariouji/status/2112507321339478259)
 
 ## Safety
 
