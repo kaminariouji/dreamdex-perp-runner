@@ -12,7 +12,7 @@ COPY packages packages
 COPY strategies strategies
 COPY advanced advanced
 COPY scripts scripts
-COPY .env.railway .env
+# .env.railway is intentionally not shipped; runtime config comes from platform env vars.
 
 RUN npm ci
 
