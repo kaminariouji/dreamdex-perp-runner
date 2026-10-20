@@ -29,3 +29,6 @@ venv/
 # python build artifacts
 *.egg-info/
 .pytest_cache/
+
+# Run logs are generated, not source. Committed evidence lives in evidence/.
+runs/

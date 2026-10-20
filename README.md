@@ -18,7 +18,7 @@ Built for the **dreamDEX Perps Builder Bounty, MVP track** (19 October – 1 Nov
 | Strategy | Bracketed market entry, watched take-profit and stop-loss, repeated cycles |
 | Key | A bot key linked in the dreamDEX app — it can place and cancel orders, never withdraw |
 | Capital | Paper USDso from Perps Arena; the only real cost is testnet gas |
-| Evidence | `runs/ETH-PERP-<date>.jsonl`, one JSON line per event |
+| Evidence | `runs/<SYMBOL>-<date>-<pid>.jsonl`, one JSON line per event; the committed sample is `evidence/ETH-PERP-2026-10-20.jsonl` |
 
 ## Who it is for
 
@@ -71,14 +71,27 @@ Accounts used: bot key `0xc3928694DF1e99eA81a537C1c6055267021144E9`, account
 `eth_getTransactionByHash` on `https://api.hideki2.infra.testnet.somnia.network`.
 
 `node strategies/perp-runner/summarize.mjs <run.jsonl>` regenerates the second table from a log.
+The committed log predates per-pid file names, so the script splits it into **5** groups rather
+than 4 and only the last two reproduce rows above; the first two runs are interleaved and cannot
+be separated after the fact.
 
 ### What the numbers say
 
-The harness is solid: 36 cycles, every position closed, no orphan left open, and the timeout path
-flattens instead of adopting a position into the next cycle. The strategy is not profitable at
-these settings — a 0.12% take-profit is inside two minutes of noise on ETH-PERP, so 27 of 36
-cycles ended on the timeout rather than on a level. That is a parameter finding, not a code
-finding: widening the target or trailing the mark is the next experiment.
+36 cycles ran across four runs. The timeout path does flatten instead of adopting a position into
+the next cycle. Two things the log does **not** support, stated plainly:
+
+- **10 of 36 cycles have no "close" event.** 5 ended with the position already gone when the bot
+  looked (outcome `closed`), and 5 reached the wait limit only to find nothing left to flatten.
+  "Every position closed" is a claim about what the bot attempts, not something this log proves.
+- **The first two runs share one log file.** Two runners wrote to the same
+  runs/<SYMBOL>-<date>.jsonl on 2026-10-20, so their cycles interleave and some of them closed
+  each other's positions. Since this audit each run writes to ...-<pid>.jsonl instead.
+
+Of the 36 cycles, **22** ran to the wait limit, **9** ended on take-profit, and **5** ended with
+the position gone before a level was reached — an earlier summary counted those 5 as timeouts.
+The strategy is not profitable at these settings: the take-profit is inside two minutes of noise
+on ETH-PERP. That is a parameter finding, not a code finding: widening the target or trailing the
+mark is the next experiment.
 
 ## Why this side: funding
 

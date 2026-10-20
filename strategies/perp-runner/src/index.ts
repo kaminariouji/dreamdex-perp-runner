@@ -63,7 +63,21 @@ const MIN_FUNDING_APR = envNum("PERP_MIN_FUNDING_APR", 0);
 const DRY_RUN = process.env.DRY_RUN !== "false";
 
 const RUN_DIR = process.cwd() + "/runs";
-const EVIDENCE = RUN_DIR + "/" + SYMBOL + "-" + new Date().toISOString().slice(0, 10) + (DRY_RUN ? "-dryrun" : "") + ".jsonl";
+// The pid keeps one process per file: two runners on the same day used to append
+// to one log and then close each other's positions.
+const EVIDENCE =
+  RUN_DIR +
+  "/" +
+  SYMBOL +
+  "-" +
+  new Date().toISOString().slice(0, 10) +
+  (DRY_RUN ? "-dryrun" : "") +
+  "-" +
+  process.pid +
+  ".jsonl";
+
+/** Set once a live cycle can hold a position. Called when the run ends badly. */
+let emergencyExit: (() => Promise<void>) | undefined;
 
 function record(event: Record<string, unknown>): void {
   const line = JSON.stringify({ at: new Date().toISOString(), symbol: SYMBOL, dryRun: DRY_RUN, ...event });
@@ -71,8 +85,11 @@ function record(event: Record<string, unknown>): void {
   try {
     mkdirSync(RUN_DIR, { recursive: true });
     appendFileSync(EVIDENCE, line + "\n");
-  } catch {
-    // A missing runs/ directory must never stop a live position from closing.
+  } catch (err) {
+    // A missing runs/ directory must never stop a live position from closing,
+    // but a line that never lands must not be silent either: the log is the
+    // only evidence an order was sent.
+    console.error("[evidence] NOT WRITTEN: " + (err instanceof Error ? err.message : String(err)));
   }
 }
 
@@ -83,6 +100,51 @@ async function main(): Promise<void> {
   const stopped = onStop();
   const market = await requireMarket(ctx.exchange, ctx.config.symbol || SYMBOL);
   const me = ctx.exchange.walletAddress as `0x${string}` | undefined;
+
+  // From here a cycle can be holding a position, so the run needs a way out that
+  // does not depend on the watch loop finishing. The exits live in this process
+  // (a trading key cannot arm stops), so a crash would otherwise leave the
+  // position open with nothing protecting it.
+  emergencyExit = async () => {
+    if (DRY_RUN || !me) return;
+    try {
+      const still = await positionIn(ctx.exchange, market);
+      if (!still) return;
+      console.error("ending with a position open — flattening before exit");
+      const closed = await closePosition(ctx, market, me, { label: "exit" });
+      record({
+        event: "close",
+        reason: "exit",
+        sent: closed?.sent ?? false,
+        orderId: closed?.orderId ? String(closed.orderId) : null,
+        txHash: closed?.txHash ?? null,
+      });
+      if (!closed?.sent) console.error("WARNING: the position is STILL OPEN and no stop is armed");
+    } catch (err) {
+      console.error(
+        "WARNING: flatten on exit failed, the position is STILL OPEN: " +
+          (err instanceof Error ? err.message : String(err)),
+      );
+    }
+  };
+
+  // The settings that produced the evidence belong in the evidence: without them
+  // a log cannot tell you what the run was actually trying to do.
+  record({
+    event: "run-start",
+    pid: process.pid,
+    side: SIDE,
+    leverage: LEVERAGE,
+    notional: NOTIONAL,
+    takeProfitPct: TAKE_PROFIT_PCT,
+    stopLossPct: STOP_LOSS_PCT,
+    tickMs: TICK_MS,
+    maxWaitMs: MAX_WAIT_MS,
+    minFundingApr: MIN_FUNDING_APR,
+    maxCycles: MAX_CYCLES,
+    account: me ?? null,
+    owner: ctx.config.owner ?? null,
+  });
 
   console.log(
     "perp-runner on " + market.display + " | " + SIDE + " " + NOTIONAL + " USDso at " + LEVERAGE + "x | " +
@@ -116,7 +178,7 @@ async function main(): Promise<void> {
     }
   }
 
-  const summary = { cycles: 0, takeProfit: 0, stopLoss: 0, timeouts: 0, netPnl: 0 };
+  const summary = { cycles: 0, takeProfit: 0, stopLoss: 0, timeouts: 0, closed: 0, netPnl: 0 };
 
   for (let cycle = 1; cycle <= MAX_CYCLES && !stopped(); cycle++) {
     record({ event: "cycle-start", cycle });
@@ -238,17 +300,25 @@ async function main(): Promise<void> {
       if (hitTakeProfit || hitStopLoss) {
         const reason = hitTakeProfit ? "take-profit" : "stop-loss";
         const closed = await closePosition(ctx, fresh, me, { label: reason });
+        const sent = closed?.sent === true;
         record({
           event: "close",
           cycle,
           reason,
+          sent,
           mark: live.toFixed(2),
           upnl: lastPnl,
           orderId: closed?.orderId ? String(closed.orderId) : null,
           txHash: closed?.txHash ?? null,
         });
-        outcome = reason;
-        break;
+        // closePosition comes back quietly when the market is un-priceable or the
+        // book is empty. Counting that as a win would put a closed trade in the
+        // summary for a position that never closed, so keep watching instead.
+        if (sent) {
+          outcome = reason;
+          break;
+        }
+        console.log(reason + " reached but the close did not go through — still holding, retrying next tick");
       }
     }
 
@@ -264,16 +334,21 @@ async function main(): Promise<void> {
           event: "close",
           cycle,
           reason: "timeout",
+          sent: closed?.sent === true,
           upnl: lastPnl,
           orderId: closed?.orderId ? String(closed.orderId) : null,
           txHash: closed?.txHash ?? null,
         });
+        if (closed?.sent !== true) console.log("the timeout flatten did not go through — the position is still open");
       }
     }
 
     summary.cycles++;
     if (outcome === "take-profit") summary.takeProfit++;
     else if (outcome === "stop-loss") summary.stopLoss++;
+    // "closed" is the position going away on its own, which used to be counted as
+    // a timeout and made the run look slower than it was.
+    else if (outcome === "closed") summary.closed++;
     else summary.timeouts++;
     summary.netPnl += lastPnl;
     record({ event: "cycle-end", cycle, outcome, upnl: lastPnl });
@@ -294,8 +369,11 @@ async function main(): Promise<void> {
 
 main().then(
   () => process.exit(0),
-  (err) => {
+  async (err) => {
     console.error(err instanceof Error ? err.message : err);
+    // The exits only act while this process runs, so an unhandled error used to
+    // leave an open position with nothing watching it. Flatten first, then stop.
+    await emergencyExit?.();
     process.exit(1);
   },
 );

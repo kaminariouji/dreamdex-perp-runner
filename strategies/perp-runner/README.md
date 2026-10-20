@@ -55,8 +55,8 @@ fallback: **a `.env` line always wins**, including `DRY_RUN`.
 | `PERP_LEVERAGE` | `2` | Leverage set on the pool before entry |
 | `PERP_NOTIONAL_USDSO` | `60` | Position **value**, not margin |
 | `PERP_MIN_FUNDING_APR` | `0` | Skip the entry unless funding pays this side at or above this APR; `0` disables the gate |
-| `PERP_TAKE_PROFIT_PCT` | `1.5` | Take-profit distance from the entry mark |
-| `PERP_STOP_LOSS_PCT` | `1` | Stop-loss distance from the entry mark |
+| `PERP_TAKE_PROFIT_PCT` | `1.5` | Take-profit distance from the live pool mark read when the cycle starts watching |
+| `PERP_STOP_LOSS_PCT` | `1` | Stop-loss distance from the same mark — not from the fill price, and for a position adopted mid-run, not from its entry |
 | `PERP_TICK_MS` | `10000` | How often the mark is read |
 | `PERP_MAX_CYCLES` | `3` | Cycles before the bot stops |
 | `PERP_COOLDOWN_MS` | `15000` | Pause between cycles |
@@ -65,10 +65,12 @@ fallback: **a `.env` line always wins**, including `DRY_RUN`.
 
 ## Evidence
 
-Each run appends JSON lines to `runs/<SYMBOL>-<date>.jsonl`:
+Each run appends JSON lines to `runs/<SYMBOL>-<date>-<pid>.jsonl` — the pid keeps two runners on
+the same day from writing to one file. `runs/` is gitignored; the committed sample lives in
+`evidence/` at the repository root:
 
 ```json
-{"at":"2026-10-20T11:04:02.423Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":1}
+{"at":"2026-10-20T11:06:08.516Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":1}
 {"at":"2026-10-20T13:37:55.961Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":5,"side":"long","price":"2400.35","quantity":"25000000000000000","sent":true,"filled":"25000000000000000","orderId":"16380708737454088776412","txHash":"0x7579ae2183455710b22461c6c2ae9e999120d7c2b546283eb5d944289d046f59"}
 ```
 

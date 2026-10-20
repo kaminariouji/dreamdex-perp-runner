@@ -52,9 +52,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Installs dependencies and runs static checks that actually exist as scripts.
-  # `npm ci` triggers the postinstall build; `npm run typecheck` builds core and
-  # runs `tsc --noEmit` across the workspaces (no lint/test scripts exist yet).
+  # Installs dependencies and runs the checks that exist as scripts: `npm ci`
+  # triggers the postinstall build, `npm run typecheck` builds core and runs
+  # `tsc --noEmit` across the workspaces, and `npm test` runs vitest in
+  # backtest, ec-core and perp-core.
   install-and-check:
     name: install & typecheck
     runs-on: ubuntu-latest
@@ -73,6 +74,11 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      # Twelve test files across backtest, ec-core and perp-core. Until this step
+      # existed none of them ran on a pull request.
+      - name: Test
+        run: npm test
 
       # Rules typecheck cannot see: a strategy missing from the Railway
       # allow-list, a knob absent from .env.example, an address that drifted

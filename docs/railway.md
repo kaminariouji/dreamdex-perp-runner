@@ -40,13 +40,13 @@ For DreamDEX maintainers publishing the template:
 1. In Railway: **Workspace → Templates → New Template**.
 2. Add a service sourced from `https://github.com/somnia-chain/dreamdex-bot-kit` (pin branch/tag as needed).
 3. Railway picks up [`railway.toml`](../railway.toml) and the Dockerfile on deploy.
-4. Leave the template variables **empty** — the baked [`.env.railway`](../.env.railway) supplies every non-secret default. Users set their config (including **`PRIVATE_KEY`**) in the service's **Variables → RAW Editor** after deploying. Do **not** declare `PRIVATE_KEY` as a template variable.
+4. Leave the template variables **empty** — every non-secret default comes from the code (see each strategy README). Users set their config (including **`PRIVATE_KEY`**) in the service's **Variables → RAW Editor** after deploying. Do **not** declare `PRIVATE_KEY` as a template variable.
 5. **Do not** enable public networking for this service.
 6. Create template, copy the share URL (e.g. `https://railway.com/deploy/...`).
 7. Paste that URL into `docs/railway.md` under **Template URL** once live.
 8. Optional: [publish to the marketplace](https://docs.railway.com/templates/publish-and-share).
 
-The Docker image also copies `.env.railway` → `.env`, so a service with **only** `PRIVATE_KEY` set in Railway still gets every other default at runtime.
+The Docker image ships **no** `.env` — see the note in the `Dockerfile`. A service therefore needs its non-secret defaults set in **Variables → RAW Editor** as well; anything left unset falls back to the code default.
 
 ### Template URL
 
@@ -54,7 +54,7 @@ The Docker image also copies `.env.railway` → `.env`, so a service with **only
 
 Deploy link: https://railway.com/deploy/pE6EIF
 
-After deploying, set your config in the service's **Variables → RAW Editor** (paste your env block, including **`PRIVATE_KEY`**). Anything you don't set falls back to the baked [`.env.railway`](../.env.railway) defaults.
+After deploying, set your config in the service's **Variables → RAW Editor** (paste your env block, including **`PRIVATE_KEY`**). Anything you don't set falls back to the defaults documented in the strategy README.
 
 ---
 
@@ -72,15 +72,15 @@ Fund the bot wallet (SOMI for gas + tokens for the market). See [Getting started
 
 ## Environment variables
 
-Canonical defaults for Railway live in [`.env.railway`](../.env.railway) (committed, no `PRIVATE_KEY`). Import that file in the Railway UI or rely on the baked-in `.env` in the Docker image.
+Defaults for Railway come from the code (see each strategy README). There is no committed `.env.railway`; paste the values you want into the Railway UI.
 
 | Variable | Required | Default | Notes |
 |----------|----------|---------|--------|
-| `PRIVATE_KEY` | Yes | — | Set only in Railway; never in `.env.railway` |
-| `STRATEGY` | No | `starter` | See `.env.railway` |
+| `PRIVATE_KEY` | Yes | — | Set only in Railway; never in a committed file |
+| `STRATEGY` | No | `starter` | See each strategy README |
 | `NETWORK` | No | `testnet` | |
 | `DRY_RUN` | No | `true` | |
-| Strategy knobs | No | see `.env.railway` | All six builder strategies included |
+| Strategy knobs | No | see each strategy README | All six builder strategies included |
 
 ### Market symbol env names
 
@@ -129,7 +129,7 @@ docker run --rm -e PRIVATE_KEY=0x... -e STRATEGY=starter -e DRY_RUN=true dreamde
 3. **Copy** the block; the **Deploy on Railway** button opens the template.
 4. User pastes the block into Railway **Variables → RAW Editor**, fills in their `PRIVATE_KEY`, and deploys.
 
-Template defaults (`.env.railway`) cover the “I skipped the builder” path. Builder-generated env overrides those when pasted. **Never** put `PRIVATE_KEY` in DreamDEX URLs or store it server-side.
+Template defaults (the code defaults) cover the “I skipped the builder” path. Builder-generated env overrides those when pasted. **Never** put `PRIVATE_KEY` in DreamDEX URLs or store it server-side.
 
 ---
 

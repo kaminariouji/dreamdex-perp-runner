@@ -36,13 +36,18 @@ for (const [i, run] of runs.entries()) {
   console.log("|---|---|---|---|---|---|---|");
   for (const end of ends) {
     const open = opens.get(end.cycle) ?? {};
-    const close = run.rows.find((r) => r.event === "close" && r.cycle === end.cycle) ?? {};
+    // A cycle can log a close that never went through (sent false) and then retry,
+    // so the row that counts is the one that was actually sent.
+    const closes = run.rows.filter((r) => r.event === "close" && r.cycle === end.cycle);
+    const close = closes.find((r) => r.sent === true) ?? closes.at(-1) ?? {};
     console.log(
       `| ${end.cycle} | ${end.outcome} | ${usd(end.upnl ?? 0)} | ${short(open.orderId)} | ${short(open.txHash)} | ${short(close.orderId)} | ${short(close.txHash)} |`,
     );
   }
   console.log(
-    `\nTake-profit ${count("take-profit")} · stop-loss ${count("stop-loss")} · timeout ${count("timeout")} · other ${ends.length - count("take-profit") - count("stop-loss") - count("timeout")}\n`,
+    `\nTake-profit ${count("take-profit")} · stop-loss ${count("stop-loss")} · timeout ${count("timeout")} · closed ${count(
+      "closed",
+    )} · other ${ends.length - count("take-profit") - count("stop-loss") - count("timeout") - count("closed")}\n`,
   );
 }
 console.log(`Source: \`${file}\` (${rows.length} events).`);
