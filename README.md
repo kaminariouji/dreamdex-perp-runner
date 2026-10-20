@@ -109,8 +109,11 @@ than the funding pays.
 That is not a hypothesis here. We ran it: short BTC-PERP at 81,968.80, and 17 minutes later the
 mark was 83,432.40. Price cost $5.36, funding paid about $0.02, and the run closed flat by hand
 (order `21767158006977277443853`). Unhedged carry at this size is a directional bet with a
-rounding error attached. It only becomes carry when the other leg exists, and this venue has no
-spot market to hedge against yet — so the gate is shipped as a filter, not as a strategy.
+rounding error attached.
+
+The other leg exists: the venue lists WBTC/USDso as a spot market (102,755 trades at the time of
+writing), so the short can be hedged instead of hoped at. The gate is shipped as a filter, and the
+hedged version is the next build — the numbers above are the argument for it.
 
 ## Feedback items
 
