@@ -52,7 +52,9 @@ fallback: **a `.env` line always wins**, including `DRY_RUN`.
 | --- | --- | --- |
 | `PERP_SYMBOL` | `ETH-PERP` | Market to trade |
 | `PERP_SIDE` | `long` | `long` or `short` |
+| `PERP_LEVERAGE` | `2` | Leverage set on the pool before entry |
 | `PERP_NOTIONAL_USDSO` | `60` | Position **value**, not margin |
+| `PERP_MIN_FUNDING_APR` | `0` | Skip the entry unless funding pays this side at or above this APR; `0` disables the gate |
 | `PERP_TAKE_PROFIT_PCT` | `1.5` | Take-profit distance from the entry mark |
 | `PERP_STOP_LOSS_PCT` | `1` | Stop-loss distance from the entry mark |
 | `PERP_TICK_MS` | `10000` | How often the mark is read |
@@ -67,7 +69,13 @@ Each run appends JSON lines to `runs/<SYMBOL>-<date>.jsonl`:
 
 ```json
 {"at":"2026-10-20T11:04:02.423Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":1}
-{"at":"2026-10-20T11:04:04.957Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":1,"side":"long","price":"2388.14","quantity":"8300000000000000","sent":true,"filled":"8300000000000000"}
+{"at":"2026-10-20T13:37:55.961Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":5,"side":"long","price":"2400.35","quantity":"25000000000000000","sent":true,"filled":"25000000000000000","orderId":"16380708737454088776412","txHash":"0x7579ae2183455710b22461c6c2ae9e999120d7c2b546283eb5d944289d046f59"}
 ```
 
-Order ids in the log can be checked against the Somnia Tokyo testnet explorer.
+`open` and `close` events carry both the `orderId` and the `txHash` of the transaction
+that carried the order, so a log line can be checked end to end: paste the hash into
+`https://explorer.testnet.somnia.network/tx/<hash>`, or call `eth_getTransactionByHash`
+on `https://api.hideki2.infra.testnet.somnia.network`.
+
+`node summarize.mjs runs/<file>.jsonl` turns a log into a markdown table of outcome,
+uPnL and both order ids, which is how the evidence table in the root README is produced.
