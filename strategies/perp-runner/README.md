@@ -16,7 +16,8 @@ It is built for the **Perps Builder Bounty MVP track** and runs against
 4. Sets take-profit and stop-loss against the **live pool mark**, not the market
    row, which lags by tens of minutes.
 5. Watches the mark every tick and closes the whole position when either level
-   is reached, or abandons the cycle after `PERP_MAX_WAIT_PER_CYCLE_MS`.
+   is reached. A cycle that runs past `PERP_MAX_WAIT_PER_CYCLE_MS` is closed flat
+   instead of being carried into the next cycle.
 6. Writes one JSON line per event to `runs/`.
 
 ## Why not just perp-starter
