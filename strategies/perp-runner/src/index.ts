@@ -138,7 +138,16 @@ async function main(): Promise<void> {
       if (sized.limitedBy) console.log("size ceiling is set by " + sized.limitedBy + " (this is not an error on its own)");
 
       const opened = await placePerp({ ctx, market, side: SIDE, price, quantity: sized.quantity, orderType: ORDER_TYPE.MARKET, label: "open" });
-      record({ event: "open", cycle, side: SIDE, price: px(price), quantity: String(sized.quantity), sent: opened.sent, filled: String(opened.filled ?? BigInt(0)) });
+      record({
+        event: "open",
+        cycle,
+        side: SIDE,
+        price: px(price),
+        quantity: String(sized.quantity),
+        sent: opened.sent,
+        filled: String(opened.filled ?? BigInt(0)),
+        orderId: opened.orderId ? String(opened.orderId) : null,
+      });
       if (opened.sent && opened.filled === BigInt(0)) {
         console.log("nothing crossed, the price moved. Exiting rather than resting an unintended maker order.");
         break;
@@ -192,8 +201,15 @@ async function main(): Promise<void> {
 
       if (hitTakeProfit || hitStopLoss) {
         const reason = hitTakeProfit ? "take-profit" : "stop-loss";
-        await closePosition(ctx, fresh, me, { label: reason });
-        record({ event: "close", cycle, reason, mark: live.toFixed(2), upnl: lastPnl });
+        const closed = await closePosition(ctx, fresh, me, { label: reason });
+        record({
+          event: "close",
+          cycle,
+          reason,
+          mark: live.toFixed(2),
+          upnl: lastPnl,
+          orderId: closed?.orderId ? String(closed.orderId) : null,
+        });
         outcome = reason;
         break;
       }
@@ -206,8 +222,14 @@ async function main(): Promise<void> {
       const stale = await requireMarket(ctx.exchange, market.symbol, { reload: true });
       const stillOpen = await positionIn(ctx.exchange, stale);
       if (stillOpen) {
-        await closePosition(ctx, stale, me, { label: "timeout" });
-        record({ event: "close", cycle, reason: "timeout", upnl: lastPnl });
+        const closed = await closePosition(ctx, stale, me, { label: "timeout" });
+        record({
+          event: "close",
+          cycle,
+          reason: "timeout",
+          upnl: lastPnl,
+          orderId: closed?.orderId ? String(closed.orderId) : null,
+        });
       }
     }
 
