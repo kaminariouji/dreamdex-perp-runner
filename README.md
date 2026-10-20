@@ -124,6 +124,7 @@ The feedback track wants one Markdown file per issue. Items found while building
 - [02 — In trading-key mode, armBracket fails with an SDK-internal error](feedback/02-trading-key-cannot-arm-stops.md)
 - [03 — sizeForNotional returns 0n instead of a below-minimum error](feedback/03-size-for-notional-silent-zero.md)
 - [04 — Market-data calls reject the display name, with a hint that is already satisfied](feedback/04-display-name-rejected-by-market-data.md)
+- [05 — "Link your Discord" stays at 0/1 while the wallet shows the account linked](feedback/05-discord-quest-stuck.md)
 
 ## X posts
 
