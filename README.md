@@ -104,8 +104,13 @@ standing down: funding pays short at 155.64% APR, below the 50% gate for a long
 
 Scale, stated plainly: 170% APR is 0.019% per hour. On a $300 short that is about six cents an
 hour, so a 90-minute run measures the mechanism, not the yield — over a day the price moves more
-than the funding pays. The carry only becomes the dominant term when the position is held for
-days, or when it is hedged, and this market has no spot leg to hedge with yet.
+than the funding pays.
+
+That is not a hypothesis here. We ran it: short BTC-PERP at 81,968.80, and 17 minutes later the
+mark was 83,432.40. Price cost $5.36, funding paid about $0.02, and the run closed flat by hand
+(order `21767158006977277443853`). Unhedged carry at this size is a directional bet with a
+rounding error attached. It only becomes carry when the other leg exists, and this venue has no
+spot market to hedge against yet — so the gate is shipped as a filter, not as a strategy.
 
 ## Feedback items
 
