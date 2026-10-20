@@ -29,6 +29,7 @@ const ALLOWED = new Set([
   "ec-oracle-follow",
   "ec-settlement",
   "perp-starter",
+  "perp-runner",
   "perp-maker",
   "perp-funding",
   "perp-guard",
