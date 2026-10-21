@@ -33,27 +33,41 @@ be watched by the bot and only protects the position while the bot runs.
 ## Run it
 
 ```bash
-git clone <this repo> && cd dreamdex-perp-runner
+git clone https://github.com/kaminariouji/dreamdex-perp-runner.git
+cd dreamdex-perp-runner
 npm install
 cp strategies/perp-runner/.env.example strategies/perp-runner/.env
 # fill in PRIVATE_KEY (the linked bot key) and OWNER_ADDRESS (your account)
 npm start -w perp-runner     # DRY_RUN=true until you change it
 ```
 
-Node 20 or newer. Full configuration reference:
-[strategies/perp-runner/README.md](strategies/perp-runner/README.md).
+Node 20 or newer.
+
+> **Do not copy the repo-root `.env.example`.** It sets `NETWORK=testnet`, which is the Shannon
+deployment (chain 50312), not the Tokyo testnet these perps run on. `loadEnv()` walks up from the
+working directory, so a root `.env` is picked up by a perp run that has no `.env` of its own and
+moves it to Shannon without a word. The strategy-local file above sets `NETWORK=hideki` (chain
+50383), and every run prints the network and chain id it resolved on the first line.
+
+Full configuration reference: [strategies/perp-runner/README.md](strategies/perp-runner/README.md).
+Design notes and the operational detail behind this README: [docs/](docs/).
 
 ## Evidence
 
 Every run below placed and closed real orders on Somnia Tokyo testnet, with paper USDso from the
 Perps Arena. Totals come from the `summary` event each run writes to its own log.
 
-| Run (2026-10-20) | Cycles | Take-profit | Stop-loss | Timeout | Net uPnL (USDso) |
+| Run (2026-10-20) | Cycles | Take-profit | Stop-loss | Timeout † | Net uPnL (USDso) |
 | --- | --- | --- | --- | --- | --- |
-| 12:33 UTC | 10 | 0 | 0 | 10 | −0.5075 |
-| 12:45 UTC | 10 | 2 | 0 | 8 | −0.0986 |
+| 12:33 UTC | 10 | 0 | 0 | 10 † | −0.5075 |
+| 12:45 UTC | 10 | 2 | 0 | 8 † | −0.0986 |
 | 13:21 UTC | 10 | 3 | 0 | 7 | −0.6831 |
 | 13:45 UTC | 6 | 4 | 0 | 2 | −0.0611 |
+
+† These two runs shared one log, so each `summary` event counts every cycle that did not hit a
+level as a timeout. Re-reading the `cycle-end` events, **5 of their combined 18** ended with the
+position already gone (`closed`) and 13 reached the wait limit. The 13:21 and 13:45 rows match
+their `cycle-end` events exactly. The paragraph below explains why the split cannot be recovered.
 
 The last run, in full — order id and transaction hash for both legs of every cycle:
 
@@ -152,9 +166,11 @@ Posts about this MVP, tagging [@DreamDEXSomnia](https://x.com/DreamDEXSomnia):
 
 ## Safety
 
-`DRY_RUN` defaults to true in code and in `.env.example`, but a `.env` line overrides the code
-default — check the effective value before you start a run. The bot never withdraws: a linked bot
-key has no withdrawal rights.
+`DRY_RUN` defaults to true in code and in `.env.example`. `DRY_RUN=false` and `DRY_RUN=0` both turn
+it off — one parser reads both, so the mode in the evidence always matches the mode that sent the
+orders. A `.env` line overrides the code default, so check the effective value before a run; the
+first line of every run prints it. The bot never withdraws: a linked bot key has no withdrawal
+rights.
 
 ## License
 

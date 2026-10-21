@@ -70,6 +70,15 @@ export function envBool(name: string, fallback: boolean): boolean {
 }
 
 /**
+ * The one place DRY_RUN is resolved. `Config.dryRun` and the perp-runner both
+ * call this, because two parsers is how the runner once sent real orders while
+ * its evidence claimed `dryRun: true` and its exit path stayed disabled.
+ */
+export function dryRunMode(): boolean {
+  return envBool("DRY_RUN", true);
+}
+
+/**
  * The OperatorPermissionsRegistry, which arming a stop order needs.
  *
  * It is NOT in the SDK's bundled address sets (neither SOMNIA_TESTNET_ADDRESSES
@@ -174,7 +183,7 @@ export function loadConfig(): PerpConfig {
     symbol: (process.env.PERP_SYMBOL ?? "").trim(),
     privateKey: pk ? (pk as `0x${string}`) : undefined,
     owner: ownerRaw ? getAddress(ownerRaw) : undefined,
-    dryRun: envBool("DRY_RUN", true),
+    dryRun: dryRunMode(),
   };
 }
 

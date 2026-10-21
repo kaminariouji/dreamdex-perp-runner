@@ -37,16 +37,26 @@ key can place and cancel orders but can never withdraw funds.
 
 ## Run it
 
+From the repository root — the paths matter, because `loadEnv()` picks up the
+*nearest* `.env` walking up from the working directory:
+
 ```bash
-cp .env.example .env      # fill in PRIVATE_KEY (bot key) and OWNER_ADDRESS
-npm install               # from the repository root
+cp strategies/perp-runner/.env.example strategies/perp-runner/.env
+# fill in PRIVATE_KEY (bot key) and OWNER_ADDRESS; keep NETWORK=hideki
+npm install
 npm start -w perp-runner  # DRY_RUN=true until you say otherwise
 ```
+
+`NETWORK=hideki` (chain 50383) is where the perps are. A repo-root `.env` copied
+from the root `.env.example` says `NETWORK=testnet` (Shannon, chain 50312) and
+takes over silently for any run that has no strategy-local `.env`; every run
+prints the network and chain id it resolved.
 
 ## Configuration
 
 Every value above is read from `.env`. The defaults in code exist only as a
-fallback: **a `.env` line always wins**, including `DRY_RUN`.
+fallback: **a `.env` line always wins**, including `DRY_RUN`. `DRY_RUN=false` and
+`DRY_RUN=0` both mean live; every other value, or no value, means dry.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |

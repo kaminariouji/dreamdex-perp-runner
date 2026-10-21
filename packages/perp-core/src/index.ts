@@ -36,6 +36,7 @@ export {
   makeChain,
   envNum,
   envBool,
+  dryRunMode,
   type PerpConfig,
   type Network,
 } from "./config.js";

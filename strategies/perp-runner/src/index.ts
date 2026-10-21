@@ -10,19 +10,21 @@
  * cannot arm stops on the stop registry, so the bot watches the mark itself and
  * closes when a level is reached. The exits act only while the bot runs.
  *
- * Safety defaults: DRY_RUN is on unless you set DRY_RUN=false, the position is
- * sized from PERP_NOTIONAL_USDSO, and a cycle is abandoned after
+ * Safety defaults: DRY_RUN is on unless you set DRY_RUN=false (or 0), the
+ * position is sized from PERP_NOTIONAL_USDSO, and a cycle is abandoned after
  * PERP_MAX_WAIT_PER_CYCLE_MS so a stale mark cannot hold a position open.
  *
  *   npm start -w perp-runner
  */
 
 import { appendFileSync, mkdirSync } from "node:fs";
+import { relative } from "node:path";
 
 import {
   ORDER_TYPE,
   closePosition,
   createExchange,
+  dryRunMode,
   ensureLeverage,
   envNum,
   liveFunding,
@@ -60,7 +62,11 @@ const MAX_WAIT_MS = envNum("PERP_MAX_WAIT_PER_CYCLE_MS", 900000);
 // least this APR: a bracket on a coin nobody is paying to hold is a coin flip, and
 // the funding is the only part of the trade the venue states in advance.
 const MIN_FUNDING_APR = envNum("PERP_MIN_FUNDING_APR", 0);
-const DRY_RUN = process.env.DRY_RUN !== "false";
+// Shared with Config.dryRun on purpose. When this was a second parser,
+// DRY_RUN=0 meant "live" to the config and "dry" here: real orders went out while
+// the evidence said dryRun:true, the TP/SL watch loop was skipped and
+// emergencyExit stayed disabled.
+const DRY_RUN = dryRunMode();
 
 const RUN_DIR = process.cwd() + "/runs";
 // The pid keeps one process per file: two runners on the same day used to append
@@ -133,6 +139,10 @@ async function main(): Promise<void> {
   record({
     event: "run-start",
     pid: process.pid,
+    // A root .env that says NETWORK=testnet silently moves a perp run to Shannon
+    // (loadEnv walks up from the cwd), so the deployment goes in the evidence.
+    network: ctx.config.network,
+    chainId: ctx.config.chainId,
     side: SIDE,
     leverage: LEVERAGE,
     notional: NOTIONAL,
@@ -147,7 +157,8 @@ async function main(): Promise<void> {
   });
 
   console.log(
-    "perp-runner on " + market.display + " | " + SIDE + " " + NOTIONAL + " USDso at " + LEVERAGE + "x | " +
+    "perp-runner on " + market.display + " (" + ctx.config.network + ", chain " + ctx.config.chainId + ") | " +
+      SIDE + " " + NOTIONAL + " USDso at " + LEVERAGE + "x | " +
       "take-profit " + TAKE_PROFIT_PCT + "% stop-loss " + STOP_LOSS_PCT + "% | " +
       "up to " + MAX_CYCLES + " cycle(s) | dry-run " + DRY_RUN,
   );
@@ -369,7 +380,9 @@ async function main(): Promise<void> {
     "summary: " + summary.cycles + " cycle(s) | take-profit " + summary.takeProfit + " | stop-loss " + summary.stopLoss +
       " | timeout " + summary.timeouts + " | closed " + summary.closed + " | net uPnL " + summary.netPnl.toFixed(4) + " USDso",
   );
-  record({ event: "summary", ...summary, evidence: EVIDENCE });
+  // Relative to the working directory: the absolute path carried the machine's
+  // own folder names into every published evidence file.
+  record({ event: "summary", ...summary, evidence: relative(process.cwd(), EVIDENCE) });
   // The timeout flatten above only warns when its close does not go through, and a
   // run that ends on that cycle would exit with the position still open. Check once
   // more before leaving: this process is the only thing watching the mark.

@@ -47,7 +47,7 @@
 {"at":"2026-10-20T12:32:06.684Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":7}
 {"at":"2026-10-20T12:32:09.119Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":7,"side":"long","price":"2389.51","quantity":"25100000000000000","sent":true,"filled":"25100000000000000"}
 {"at":"2026-10-20T12:33:15.423Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-end","cycle":10,"outcome":"timeout","upnl":-0.013791849874948048}
-{"at":"2026-10-20T12:33:15.424Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":10,"takeProfit":0,"stopLoss":0,"timeouts":10,"netPnl":-0.5074692797794049,"evidence":"C:\\CRYPTO MONEY MAKER\\tmp\\dreamdex-bot-kit/runs/ETH-PERP-2026-10-20.jsonl"}
+{"at":"2026-10-20T12:33:15.424Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":10,"takeProfit":0,"stopLoss":0,"timeouts":10,"netPnl":-0.5074692797794049,"evidence":"runs/ETH-PERP-2026-10-20.jsonl"}
 {"at":"2026-10-20T12:35:22.301Z","symbol":"ETH-PERP","dryRun":false,"event":"close","cycle":7,"reason":"timeout","upnl":-0.10040139322179811}
 {"at":"2026-10-20T12:35:22.302Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-end","cycle":7,"outcome":"timeout","upnl":-0.10040139322179811}
 {"at":"2026-10-20T12:35:25.321Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":8}
@@ -62,7 +62,7 @@
 {"at":"2026-10-20T12:42:05.458Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":10,"side":"long","price":"2393.09","quantity":"25000000000000000","sent":true,"filled":"25000000000000000"}
 {"at":"2026-10-20T12:45:14.161Z","symbol":"ETH-PERP","dryRun":false,"event":"close","cycle":10,"reason":"take-profit","mark":"2398.66","upnl":0.14549622501074283}
 {"at":"2026-10-20T12:45:14.162Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-end","cycle":10,"outcome":"take-profit","upnl":0.14549622501074283}
-{"at":"2026-10-20T12:45:14.163Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":10,"takeProfit":2,"stopLoss":0,"timeouts":8,"netPnl":-0.09861959784365973,"evidence":"C:\\CRYPTO MONEY MAKER\\tmp\\dreamdex-bot-kit/runs/ETH-PERP-2026-10-20.jsonl"}
+{"at":"2026-10-20T12:45:14.163Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":10,"takeProfit":2,"stopLoss":0,"timeouts":8,"netPnl":-0.09861959784365973,"evidence":"runs/ETH-PERP-2026-10-20.jsonl"}
 {"at":"2026-10-20T12:45:54.717Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":1}
 {"at":"2026-10-20T12:45:56.549Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":1,"side":"long","price":"2399.70","quantity":"25000000000000000","sent":true,"filled":"25000000000000000","orderId":"5349555781375776889741"}
 {"at":"2026-10-20T12:49:36.873Z","symbol":"ETH-PERP","dryRun":false,"event":"close","cycle":1,"reason":"timeout","upnl":-0.1513440159973925,"orderId":"5275768805080938684897"}
@@ -103,7 +103,7 @@
 {"at":"2026-10-20T13:17:42.438Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":10,"side":"long","price":"2394.25","quantity":"25000000000000000","sent":true,"filled":"25000000000000000","orderId":"10164155984613969873109"}
 {"at":"2026-10-20T13:21:23.454Z","symbol":"ETH-PERP","dryRun":false,"event":"close","cycle":10,"reason":"timeout","upnl":-0.06846321999664724,"orderId":"5312662293228357799401"}
 {"at":"2026-10-20T13:21:23.454Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-end","cycle":10,"outcome":"timeout","upnl":-0.06846321999664724}
-{"at":"2026-10-20T13:21:23.455Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":10,"takeProfit":3,"stopLoss":0,"timeouts":7,"netPnl":-0.6830676399993003,"evidence":"C:\\CRYPTO MONEY MAKER\\tmp\\dreamdex-bot-kit/runs/ETH-PERP-2026-10-20.jsonl"}
+{"at":"2026-10-20T13:21:23.455Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":10,"takeProfit":3,"stopLoss":0,"timeouts":7,"netPnl":-0.6830676399993003,"evidence":"runs/ETH-PERP-2026-10-20.jsonl"}
 {"at":"2026-10-20T13:34:36.168Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-start","cycle":1}
 {"at":"2026-10-20T13:34:38.080Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":1,"side":"long","price":"2387.14","quantity":"25100000000000000","sent":true,"filled":"25100000000000000","orderId":"10201049472761388983536","txHash":"0xdeb6ddb55b016d86f51132ac411f0aa117f8df3870dfc3ec8ff1a17ad57e219b"}
 {"at":"2026-10-20T13:36:09.667Z","symbol":"ETH-PERP","dryRun":false,"event":"close","cycle":1,"reason":"take-profit","mark":"2388.46","upnl":0.005513649688286251,"orderId":"12064170624206053697342","txHash":"0xcb047780af04bf51f6ef96bc7ccfe85a26cf51c7ddb30004bf0aa00b2249096c"}
@@ -128,4 +128,4 @@
 {"at":"2026-10-20T13:41:45.399Z","symbol":"ETH-PERP","dryRun":false,"event":"open","cycle":6,"side":"long","price":"2394.98","quantity":"25000000000000000","sent":true,"filled":"25000000000000000","orderId":"5368002525449486463403","txHash":"0xb1d334b76d6b0cf72c6811c897a1fdb894f296e54dd0f790f64dc764dd5a1ab2"}
 {"at":"2026-10-20T13:45:35.846Z","symbol":"ETH-PERP","dryRun":false,"event":"close","cycle":6,"reason":"timeout","upnl":0.009952015680528349,"orderId":"21121521964397443544923","txHash":"0x2ceb8cdaa1f85ff58acee1507a991d4345ec50050030fa8183bed4197d70a98c"}
 {"at":"2026-10-20T13:45:35.847Z","symbol":"ETH-PERP","dryRun":false,"event":"cycle-end","cycle":6,"outcome":"timeout","upnl":0.009952015680528349}
-{"at":"2026-10-20T13:45:35.848Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":6,"takeProfit":4,"stopLoss":0,"timeouts":2,"netPnl":-0.06114737809861849,"evidence":"C:\\CRYPTO MONEY MAKER\\tmp\\dreamdex-bot-kit/runs/ETH-PERP-2026-10-20.jsonl"}
+{"at":"2026-10-20T13:45:35.848Z","symbol":"ETH-PERP","dryRun":false,"event":"summary","cycles":6,"takeProfit":4,"stopLoss":0,"timeouts":2,"netPnl":-0.06114737809861849,"evidence":"runs/ETH-PERP-2026-10-20.jsonl"}

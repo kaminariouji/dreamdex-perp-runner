@@ -61,3 +61,37 @@ A bot that validates its configuration against `net_version` refuses to start on
 a correctly configured Hideki endpoint, and a bot that logs `net_version` for
 support reports the wrong network. Neither is fatal once you know, which is why
 this is filed as normal rather than major: `eth_chainId` is the value to trust.
+
+## Scope: it is this endpoint, not every Somnia endpoint
+
+Re-run on 2026-10-21 against the other two public Somnia RPCs. Both answer
+`net_version` with the decimal chain id, so the mismatch is specific to the
+Hideki endpoint and not a proxy-wide convention:
+
+```
+api.hideki2.infra.testnet.somnia.network
+  eth_chainId  -> 0xc4cf    (50383)
+  net_version  -> 50000259            <- differs
+
+api.infra.testnet.somnia.network            (Shannon)
+  eth_chainId  -> 0xc488    (50312)
+  net_version  -> 50312               <- matches
+
+api.infra.mainnet.somnia.network            (Somnia mainnet)
+  eth_chainId  -> 0x13a7    (5031)
+  net_version  -> 5031                <- matches
+```
+
+Raw responses from the same 2026-10-21 run, in the order above:
+
+```json
+{"jsonrpc":"2.0","id":1,"result":"0xc4cf"}
+{"jsonrpc":"2.0","id":2,"result":"50000259"}
+{"jsonrpc":"2.0","id":1,"result":"0xc488"}
+{"jsonrpc":"2.0","id":2,"result":"50312"}
+{"jsonrpc":"2.0","id":1,"result":"0x13a7"}
+{"jsonrpc":"2.0","id":2,"result":"5031"}
+```
+
+That also makes the fix easy to check: whatever the Hideki deployment does to
+`net_version`, the other two already do the right thing.
