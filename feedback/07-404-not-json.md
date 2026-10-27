@@ -42,7 +42,7 @@ A bot that mistypes a symbol or a path cannot tell "route does not exist" from "
 
 ## Evidence
 
-Captured 2026-10-27T17:05Z.
+Captured 2026-10-27T17:05Z, re-run 2026-10-27T17:18Z.
 
 ```
 $ curl -s -i 'https://stg.api.dreamdex.io/v0/markets/SOMI:USDso' | head -6

@@ -155,6 +155,9 @@ The feedback track wants one Markdown file per issue. Items found while building
 - [03 — sizeForNotional returns 0n instead of a below-minimum error](feedback/03-size-for-notional-silent-zero.md)
 - [04 — Market-data calls reject the display name, with a hint that is already satisfied](feedback/04-display-name-rejected-by-market-data.md)
 - [05 — "Link your Discord" stays at 0/1 while the wallet shows the account linked](feedback/05-discord-quest-stuck.md)
+- [06 — fetchOrderbooks cannot request more than one symbol: the API rejects the comma-joined list the SDK sends](feedback/06-orderbooks-multi-symbol.md)
+- [07 — 404s leave the JSON error envelope: the body is text/plain and carries no name](feedback/07-404-not-json.md)
+- [08 — MarketInfo omits kind and stopRegistry, fields the API always returns](feedback/08-marketinfo-missing-fields.md)
 
 ## X posts
 

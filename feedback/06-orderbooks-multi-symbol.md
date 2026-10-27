@@ -5,7 +5,7 @@ Area: SDK
 
 ## Steps to reproduce
 
-1. Call the canonical multi-symbol orderbook endpoint the way `DreamDexRest.fetchOrderbooks` builds it (`packages/core/src/rest.ts`: `const q = encodeURIComponent(symbols.join(","))`), with two markets:
+1. Call the canonical multi-symbol orderbook endpoint the way `DreamDexRest.fetchOrderbooks` builds it (`packages/core/src/rest.ts:71-74`: `const q = encodeURIComponent(symbols.join(","))`), with two markets:
 
 ```bash
 curl -s -o /dev/null -w '%{http_code}\n' \
@@ -40,19 +40,20 @@ So the SDK helper fails for every call with two or more symbols — the only sha
 
 ## Evidence
 
-Captured 2026-10-27T17:05Z against the live endpoint.
+Captured 2026-10-27T17:05Z, re-run 2026-10-27T17:18Z against the live endpoint.
 
 ```
 $ curl -s -o /dev/null -w '%{http_code}\n' 'https://stg.api.dreamdex.io/v0/orderbooks?symbols=SOMI:USDso,WBTC:USDso&depth=2'
 400
+
 $ curl -s 'https://stg.api.dreamdex.io/v0/orderbooks?symbols=SOMI:USDso,WBTC:USDso&depth=2'
 {"context":{"invalid_symbols":["SOMI:USDso,WBTC:USDso"]},"description":"unknown market symbols: SOMI:USDso,WBTC:USDso","name":"invalid_param","status":400}
 
 $ curl -s 'https://stg.api.dreamdex.io/v0/orderbooks?symbols=SOMI:USDso&symbols=WBTC:USDso&depth=2' | head -c 120
-{"orderbooks":[{"asks":[{"price":"0.179","quantity":"473"},{"price":"0.1791","quantity":"567.6"}],"bids":[{"price":"0.17
+{"orderbooks":[{"asks":[{"price":"0.1793","quantity":"473.5"},{"price":"0.1794","quantity":...
 
 $ curl -s 'https://stg.api.dreamdex.io/v0/orderbooks?symbols=SOMI:USDso&depth=2' | head -c 60
-{"orderbooks":[{"asks":[{"price":"0.179","quantity":"473"}...
+{"orderbooks":[{"asks":[{"price":"0.1793","quantity":"473.5"}...
 ```
 
 SDK source, `packages/core/src/rest.ts`:
