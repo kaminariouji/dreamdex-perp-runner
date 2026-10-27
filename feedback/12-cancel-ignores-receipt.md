@@ -1,4 +1,4 @@
-# `cancelOrder` and `cancelOrderFor` never check the receipt, so a reverted cancel returns as success
+# `cancelOrder`, `cancelOrderFor` and the `operator.ts` write helper never check the receipt, so a reverted cancel or deposit returns as success
 
 Severity: major
 Area: SDK
@@ -69,6 +69,21 @@ $ grep -n "receipt.status" packages/core/src/execute.ts
 188:  if (receipt.status !== "success") throw new GotchaError("TX_REVERTED", ...)
 # cancelOrder starts at line 202 and cancelOrderFor at 195: neither mentions receipt.status
 ```
+
+## Same pattern in `operator.ts`: the owner-side setup calls
+
+`packages/core/src/operator.ts` wraps every write in the same receipt-less helper, so `setManualVaultMode`, `depositVault`, `withdrawVault` and `grantOperator` all report success on a reverted transaction:
+
+```ts
+async function send(ctx: ChainContext, hash: `0x${string}`): Promise<`0x${string}`> {
+  await ctx.publicClient.waitForTransactionReceipt({ hash });
+  return hash;
+}
+```
+
+For `depositVault` this compounds: it approves only when `allowance < amountRaw`, then deposits unconditionally. A reverted `approve` (a token that returns `false` instead of reverting, or a wallet that rejects the spend) is reported as success, the `deposit` that follows reverts too, and both hashes come back clean. The owner believes the vault is funded; the operator then has nothing to trade against, and `placeOrderFor` fails with `SIM_FALSE` on the first order.
+
+The fix is the same one line in `send()`: throw on `receipt.status !== "success"`.
 
 ## Suggested fix
 
