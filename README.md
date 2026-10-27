@@ -162,6 +162,7 @@ The feedback track wants one Markdown file per issue. Items found while building
 - [10 — NonceManager.resync() can hand out a nonce it already allocated](feedback/10-nonce-resync-rewinds.md)
 - [11 — DreamDexWs has no unsubscribe, and every subscribe() call is replayed forever](feedback/11-ws-no-unsubscribe.md)
 - [12 — cancelOrder, cancelOrderFor and the operator.ts write helper never check the receipt](feedback/12-cancel-ignores-receipt.md)
+- [13 — maybeClaim throttles every wallet in the process with one module-level timer](feedback/13-claim-throttle-per-process.md)
 
 ## X posts
 

@@ -18,6 +18,7 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 10 | `NonceManager.resync()` can hand out a nonce it already allocated | major | SDK | 2026-10-27 |
 | 11 | `DreamDexWs` has no unsubscribe, and every `subscribe()` call is replayed forever | normal | SDK | 2026-10-27 |
 | 12 | `cancelOrder`, `cancelOrderFor` and the `operator.ts` write helper never check the receipt | major | SDK | 2026-10-27 |
+| 13 | `maybeClaim` throttles every wallet in the process with one module-level timer | normal | SDK | 2026-10-27 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
