@@ -15,6 +15,7 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 07 | 404s leave the JSON error envelope: the body is `text/plain` and carries no `name` | normal | API | 2026-10-27 |
 | 08 | `MarketInfo` omits `kind` and `stopRegistry`, so a typed client cannot see fields the API returns | normal | SDK | 2026-10-27 |
 | 09 | `fromRaw` returns a JS number, so raw amounts above 2^53 lose digits | normal | SDK | 2026-10-27 |
+| 10 | `NonceManager.resync()` can hand out a nonce it already allocated | major | SDK | 2026-10-27 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
