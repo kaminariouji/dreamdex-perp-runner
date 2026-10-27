@@ -160,6 +160,7 @@ The feedback track wants one Markdown file per issue. Items found while building
 - [08 — MarketInfo omits kind and stopRegistry, fields the API always returns](feedback/08-marketinfo-missing-fields.md)
 - [09 — fromRaw returns a JS number, so raw amounts above 2^53 lose digits](feedback/09-fromraw-precision.md)
 - [10 — NonceManager.resync() can hand out a nonce it already allocated](feedback/10-nonce-resync-rewinds.md)
+- [11 — DreamDexWs has no unsubscribe, and every subscribe() call is replayed forever](feedback/11-ws-no-unsubscribe.md)
 
 ## X posts
 
