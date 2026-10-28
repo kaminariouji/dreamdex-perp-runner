@@ -28,6 +28,7 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 20 | Auto-vault moves real funds at startup even when dry run is enabled | major | grid-bot | 2026-10-28 |
 | 21 | A non-numeric cooldown is accepted and silently disables rate limiting | normal | grid-bot | 2026-10-28 |
 | 22 | Boolean env vars accept only the lowercase literal `true`, so `TRUE` or `1` silently enable live trading | major | grid-bot | 2026-10-28 |
+| 23 | `alignToStep` and `adjustPriceByBps` throw a SyntaxError on exponential notation | major | SDK | 2026-10-28 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
