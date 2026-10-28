@@ -29,6 +29,7 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 21 | A non-numeric cooldown is accepted and silently disables rate limiting | normal | grid-bot | 2026-10-28 |
 | 22 | Boolean env vars accept only the lowercase literal `true`, so `TRUE` or `1` silently enable live trading | major | grid-bot | 2026-10-28 |
 | 23 | `alignToStep` and `adjustPriceByBps` throw a SyntaxError on exponential notation | major | SDK | 2026-10-28 |
+| 24 | A corrupt state file is silently replaced with an empty snapshot, resetting the session loss budget and the lot history | major | SDK | 2026-10-28 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
