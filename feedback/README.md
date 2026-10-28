@@ -19,6 +19,8 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 11 | `DreamDexWs` has no unsubscribe, and every `subscribe()` call is replayed forever | normal | SDK | 2026-10-27 |
 | 12 | `cancelOrder`, `cancelOrderFor` and the `operator.ts` write helper never check the receipt | major | SDK | 2026-10-27 |
 | 13 | `maybeClaim` throttles every wallet in the process with one module-level timer | normal | SDK | 2026-10-27 |
+| 14 | `NonceManager.acquire()` checks the in-flight cap before it queues, so a burst of callers all pass it | major | SDK | 2026-10-28 |
+| 15 | `DreamDexWs.close()` leaves a scheduled reconnect armed, so the client reopens itself | normal | SDK | 2026-10-28 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
