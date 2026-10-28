@@ -21,6 +21,10 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 13 | `maybeClaim` throttles every wallet in the process with one module-level timer | normal | SDK | 2026-10-27 |
 | 14 | `NonceManager.acquire()` checks the in-flight cap before it queues, so a burst of callers all pass it | major | SDK | 2026-10-28 |
 | 15 | `DreamDexWs.close()` leaves a scheduled reconnect armed, so the client reopens itself | normal | SDK | 2026-10-28 |
+| 16 | In HTTP mode the executor reports every order as fully filled at the requested price | major | grid-bot | 2026-10-28 |
+| 17 | Failed order reconciliation is reported as a zero fill, hiding a position that may exist | major | grid-bot | 2026-10-28 |
+| 18 | The first inventory sync reserves the whole base balance as gas, so no lot is ever created | major | grid-bot | 2026-10-28 |
+| 19 | A misconfigured order size crashes the bot instead of skipping the trade | major | grid-bot | 2026-10-28 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
