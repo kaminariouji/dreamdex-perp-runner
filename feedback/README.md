@@ -25,6 +25,9 @@ One file per item, in the format the bounty asks for. Every item states the exac
 | 17 | Failed order reconciliation is reported as a zero fill, hiding a position that may exist | major | grid-bot | 2026-10-28 |
 | 18 | The first inventory sync reserves the whole base balance as gas, so no lot is ever created | major | grid-bot | 2026-10-28 |
 | 19 | A misconfigured order size crashes the bot instead of skipping the trade | major | grid-bot | 2026-10-28 |
+| 20 | Auto-vault moves real funds at startup even when dry run is enabled | major | grid-bot | 2026-10-28 |
+| 21 | A non-numeric cooldown is accepted and silently disables rate limiting | normal | grid-bot | 2026-10-28 |
+| 22 | Boolean env vars accept only the lowercase literal `true`, so `TRUE` or `1` silently enable live trading | major | grid-bot | 2026-10-28 |
 
 Base for all API items: `https://stg.api.dreamdex.io/v0`. SDK: `@dreamdex-bot-kit/core` 0.1.0.
 
